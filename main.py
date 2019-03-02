@@ -1,4 +1,5 @@
 import urllib.request, shutil, os, time
+from pathlib import Path
 import re, sys
 import json, csv
 from selenium import webdriver
@@ -37,9 +38,11 @@ def program(location, fileName, startPage):
     print(fileName)
     print(startPage)
 
-    with open(fileName, 'w+') as csv_file:
-        wr = csv.writer(csv_file, delimiter=',', lineterminator="\n")
-        wr.writerow(["Name", "Company Name", "Address", "City", "State", "Zipcode", "Phone", "Email", "Website", "Sold this year"])
+    fileExsist = Path(fileName)
+    if not fileExsist.is_file():
+        with open(fileName, 'w+') as csv_file:
+            wr = csv.writer(csv_file, delimiter=',', lineterminator="\n")
+            wr.writerow(["Name", "Company Name", "Address", "City", "State", "Zipcode", "Phone", "Email", "Website", "Sold this year"])
 
     page = int(startPage)
     count = 1
