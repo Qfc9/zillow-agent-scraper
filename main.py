@@ -3,21 +3,50 @@ import re, sys
 import json, csv
 from selenium import webdriver
 from agent import Agent
+from tkinter import *
 
 def main():
 
     # Variable Location, Space sensitive do %20
     location = "renton,wa"
-    page = 1
+    fileName = "agents.csv"
+
+    master = Tk()
+    master.title("Zillow Agent Scraper")
+    Label(master, text="Location:").grid(row=0)
+    e1 = Entry(master, width=50)
+    e1.grid(row=0, column=1, pady=5)
+
+    Label(master, text="File Name:").grid(row=1)
+    e2 = Entry(master, width=50)
+    e2.insert(0, "agents.csv")
+    e2.grid(row=1, column=1, pady=5)
+
+    Label(master, text="Start on page:").grid(row=2)
+    e3 = Entry(master, width=50)
+    e3.insert(0, "1")
+    e3.grid(row=2, column=1, pady=5)
+
+    Button(master, text='Start Scraping!', command= lambda: program(e1.get(), e2.get(), e3.get())).grid(row=3, column=1, pady=4)
+    master.mainloop()
+
+
+def program(location, fileName, startPage):
+
+    print(location)
+    print(fileName)
+    print(startPage)
+
+    with open(fileName, 'w+') as csv_file:
+        wr = csv.writer(csv_file, delimiter=',', lineterminator="\n")
+        wr.writerow(["Name", "Company Name", "Address", "City", "State", "Zipcode", "Phone", "Email", "Website", "Sold this year"])
+
+    page = int(startPage)
     count = 1
     agents = []
     threads = []
     driver = webdriver.Chrome()
     driver.set_page_load_timeout(20)
-    drivers = []
-    for i in range(10):
-        drivers.append(webdriver.Chrome())
-        drivers[-1].set_page_load_timeout(20)
 
     while True:
         print("Page: {}".format(page))
@@ -27,8 +56,8 @@ def main():
             driver.get(url)
             page_source = json.loads(driver.find_element_by_tag_name("pre").text)
         except Exception as e:
-            print("Again Error: {}".format(e))
-            time.sleep(60)
+            print("Solve the Captcha: {}".format(e))
+            time.sleep(90)
             continue
 
 
@@ -36,25 +65,16 @@ def main():
         if count == 0:
             break
 
-        print("Agent Creation")
+        # print("Agent Creation")
         for idx, item in enumerate(page_source["model"]["viewModel"]["boards"]["boards"]):
-            agents.append(Agent(item, drivers[idx]))
+            agents.append(Agent(item, driver))
+            with open(fileName, 'a') as csv_file:
+                wr = csv.writer(csv_file, delimiter=',', lineterminator="\n")
+                wr.writerow(list(agents[-1]))
 
-        time.sleep(30)
         page += 1
 
     driver.close()
-    for driver in drivers:
-        driver.close()
-
-    print(len(agents))
-
-    with open("agents.csv", 'w+') as csv_file:
-        wr = csv.writer(csv_file, delimiter=',', lineterminator="\n")
-        wr.writerow(["Name", "Company Name", "Address", "City", "State", "Zipcode", "Phone", "Email", "Website", "Sold this year"])
-        for agent in agents:
-            wr.writerow(list(agent))
-
 
 if __name__ == '__main__':
     main()

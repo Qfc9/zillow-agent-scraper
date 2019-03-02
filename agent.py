@@ -22,23 +22,19 @@ class Agent(object):
         self.profile = jsonAgent["href"]
         self.sold = ""
         self.driver = driver
-        # self.getAdditionalInfo()
-        # Agent.count += 1
-        # print("Agen Count: {}".format(Agent.count))
-        self.thread = Thread(target = self.getAdditionalInfo)
-        self.thread.start()
+        self.getAdditionalInfo()
+        Agent.count += 1
+        print("Agent Count: {}".format(Agent.count))
+        # self.thread = Thread(target = self.getAdditionalInfo)
+        # self.thread.start()
 
     def getAdditionalInfo(self):
         user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/72.0.3626.109 Safari/537.36'
         headers = {'User-Agent': user_agent}
 
-        print("Zillow Data")
+        # print("Zillow Data")
         try:
-            # req = urllib.request.Request("https://zillow.com/"+self.profile, None, headers, method='GET')
-            # with urllib.request.urlopen(req, timeout=5) as response:
-            #     page_source = response.read().decode('utf-8', "ignore")
 
-            self.driver.get("https://zillow.com/"+self.profile)
             self.driver.get("https://zillow.com/"+self.profile)
             time.sleep(1)
             page_source = self.driver.page_source
@@ -56,13 +52,9 @@ class Agent(object):
             print("Zillow Info Error: {}".format(e))
             pass
 
-        print("Email Data")
+        # print("Email Data")
 
         try:
-            # print(self.website)
-            # req = urllib.request.Request(self.website, None, headers, method='GET')
-            # with urllib.request.urlopen(req, timeout=5) as response:
-            #     page_source = response.read().decode('utf-8', "ignore")
             self.driver.get(self.website)
             self.driver.get(self.website)
             time.sleep(1)
